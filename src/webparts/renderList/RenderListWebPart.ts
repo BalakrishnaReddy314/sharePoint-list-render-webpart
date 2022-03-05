@@ -1,27 +1,82 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import * as React from "react";
+import * as ReactDom from "react-dom";
+import { Version } from "@microsoft/sp-core-library";
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+  PropertyPaneTextField,
+  PropertyPaneDropdown,
+  IPropertyPaneDropdownOption,
+  PropertyPaneDropdownOptionType,
+} from "@microsoft/sp-property-pane";
+import { PropertyFieldMultiSelect } from "@pnp/spfx-property-controls/lib/PropertyFieldMultiSelect";
+import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 
-import * as strings from 'RenderListWebPartStrings';
-import RenderList from './components/RenderList';
-import { IRenderListProps } from './components/IRenderListProps';
+import * as strings from "RenderListWebPartStrings";
+import RenderList from "./components/RenderList";
+import { IRenderListProps } from "./components/IRenderListProps";
+import { SPFI, spfi, SPFx } from "@pnp/sp";
+import SPServices from "./Services/SPServices";
 
 export interface IRenderListWebPartProps {
-  description: string;
+  selectList: string;
+  fields: string[];
+  fieldDetails: any;
 }
 
 export default class RenderListWebPart extends BaseClientSideWebPart<IRenderListWebPartProps> {
+  private _services: SPServices;
+  private _lists: IPropertyPaneDropdownOption[] = [];
+
+  private async _renderTitle() {
+    this._services.getLists().then((results) => {
+      results.map((list) => {
+        this._lists.push({ key: list.Id, text: list.Title });
+      });
+    });
+  }
+
+  protected onInit(): Promise<void> {
+    const sp = spfi().using(SPFx(this.context));
+    this._services = new SPServices(this.context);
+    this._renderTitle();
+    return Promise.resolve();
+  }
+
+  protected onPropertyPaneFieldChanged(
+    propertyPath: string,
+    oldValue: any,
+    newValue: any
+  ): void {
+    if (propertyPath === "selectList") {
+      this.properties.fieldDetails = [];
+      this._services
+        .getListFields(this.properties.selectList)
+        .then((results) => {
+          results.map((field) => {
+            this.properties.fieldDetails.push({
+              key: field.InternalName,
+              text: field.Title,
+              type: field["odata.type"],
+            });
+            this.context.propertyPane.refresh();
+          });
+        });
+      // console.log(this.properties.fieldDetails);
+    }
+    this.properties.fields &&
+      this._services.getListItems(
+        this.properties.selectList,
+        this.properties.fieldDetails
+      );
+  }
 
   public render(): void {
     const element: React.ReactElement<IRenderListProps> = React.createElement(
       RenderList,
       {
-        description: this.properties.description
+        context: this.context,
+        list: this.properties.selectList,
+        fields: this.properties.fields,
       }
     );
 
@@ -33,7 +88,7 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse("1.0");
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -41,20 +96,27 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: strings.PropertyPaneDescription,
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: strings.ConfigureList,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
-              ]
-            }
-          ]
-        }
-      ]
+                PropertyPaneDropdown("selectList", {
+                  label: strings.SelectListFieldLabel,
+                  options: this._lists,
+                }),
+                PropertyFieldMultiSelect("fields", {
+                  key: strings.SelectListFieldsFieldLabel,
+                  label: strings.SelectListFieldsFieldLabel,
+                  options: this.properties.fieldDetails,
+                  selectedKeys: this.properties.fields,
+                }),
+              ],
+            },
+          ],
+        },
+      ],
     };
   }
 }

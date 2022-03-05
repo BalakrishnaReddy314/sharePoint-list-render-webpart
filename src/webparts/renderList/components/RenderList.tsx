@@ -7,18 +7,12 @@ export default class RenderList extends React.Component<IRenderListProps, {}> {
   public render(): React.ReactElement<IRenderListProps> {
     return (
       <div className={ styles.renderList }>
-        <div className={ styles.container }>
-          <div className={ styles.row }>
-            <div className={ styles.column }>
-              <span className={ styles.title }>Welcome to SharePoint!</span>
-              <p className={ styles.subTitle }>Customize SharePoint experiences using Web Parts.</p>
-              <p className={ styles.description }>{escape(this.props.description)}</p>
-              <a href="https://aka.ms/spfx" className={ styles.button }>
-                <span className={ styles.label }>Learn more</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        {this.props.list}
+        {
+          this.props.fields && this.props.fields.map((field) => {
+            return(<div>{field}</div>)
+          })
+        }
       </div>
     );
   }

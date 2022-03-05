@@ -1,7 +1,8 @@
 declare interface IRenderListWebPartStrings {
   PropertyPaneDescription: string;
-  BasicGroupName: string;
-  DescriptionFieldLabel: string;
+  ConfigureList: string;
+  SelectListFieldLabel: string;
+  SelectListFieldsFieldLabel: string;
 }
 
 declare module 'RenderListWebPartStrings' {

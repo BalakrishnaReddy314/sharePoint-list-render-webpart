@@ -1,3 +1,7 @@
+import { WebPartContext } from "@microsoft/sp-webpart-base";
+
 export interface IRenderListProps {
-  description: string;
+  context: WebPartContext;
+  list: string;
+  fields: string[];
 }
