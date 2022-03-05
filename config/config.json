@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "render-list-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/renderList/RenderListWebPart.js",
+          "manifest": "./src/webparts/renderList/RenderListWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "RenderListWebPartStrings": "lib/webparts/renderList/loc/{locale}.js"
+  }
+}
