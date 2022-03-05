@@ -58,7 +58,6 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
               text: field.Title,
               type: field["odata.type"],
             });
-            this.context.propertyPane.refresh();
           });
         });
       // console.log(this.properties.fieldDetails);
