@@ -42,6 +42,11 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
     return Promise.resolve();
   }
 
+  public mapFields() {
+    let {fields = [], fieldDetails = []} = this.properties;
+    return fields.map(f => fieldDetails.find(fDetails => fDetails.key === f));
+  }
+
   protected onPropertyPaneFieldChanged(
     propertyPath: string,
     oldValue: any,
@@ -49,6 +54,7 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
   ): void {
     if (propertyPath === "selectList") {
       this.properties.fieldDetails = [];
+      this.properties.fields = [];
       this._services
         .getListFields(this.properties.selectList)
         .then((results) => {
@@ -59,23 +65,24 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
               type: field["odata.type"],
             });
           });
+          this.context.propertyPane.refresh();
         });
-      // console.log(this.properties.fieldDetails);
     }
-    this.properties.fields &&
-      this._services.getListItems(
-        this.properties.selectList,
-        this.properties.fieldDetails
-      );
+
+    // this._services.getListItems(
+    //   this.properties.selectList,
+    //   this.mapFields()
+    // );
   }
 
   public render(): void {
+    console.log(this.properties.fields);
     const element: React.ReactElement<IRenderListProps> = React.createElement(
       RenderList,
       {
         context: this.context,
         list: this.properties.selectList,
-        fields: this.properties.fields,
+        fields: this.mapFields(),
       }
     );
 

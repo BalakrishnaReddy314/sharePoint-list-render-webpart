@@ -32,6 +32,8 @@ class SPServices {
     let select: any[] = ["Id"];
     let items = [];
 
+    console.log(selectedFields);
+
     for (let i = 0; i < selectedFields.length; i++) {
       switch (selectedFields[i].type) {
         case "SP.FieldUser":
@@ -50,14 +52,14 @@ class SPServices {
       }
     }
 
-    console.log(expand.join(), select.join());
+    // console.log(expand.join(), select.join());
 
     items = await this.sp.web.lists
       .getById(listId)
       .items.expand(expand.join())
       .select(select.join())();
 
-    console.log(items);
+    // console.log(items);
 
     return items;
   }
