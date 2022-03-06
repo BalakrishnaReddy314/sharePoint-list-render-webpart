@@ -3,6 +3,7 @@ declare interface IRenderListWebPartStrings {
   ConfigureList: string;
   SelectListFieldLabel: string;
   SelectListFieldsFieldLabel: string;
+  WebPartTitle: string;
 }
 
 declare module 'RenderListWebPartStrings' {

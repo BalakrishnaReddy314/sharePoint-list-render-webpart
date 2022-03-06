@@ -13,7 +13,6 @@ class SPServices {
     const lists: any[] = await this.sp.web.lists
       .filter("Hidden eq false and BaseTemplate eq 100")
       .select("Id,Title")();
-    console.log(lists);
     return lists;
   }
 
@@ -31,8 +30,6 @@ class SPServices {
     let expand: any[] = [];
     let select: any[] = ["Id"];
     let items = [];
-
-    console.log(selectedFields);
 
     for (let i = 0; i < selectedFields.length; i++) {
       switch (selectedFields[i].type) {
@@ -52,14 +49,11 @@ class SPServices {
       }
     }
 
-    // console.log(expand.join(), select.join());
 
     items = await this.sp.web.lists
       .getById(listId)
       .items.expand(expand.join())
       .select(select.join())();
-
-    // console.log(items);
 
     return items;
   }

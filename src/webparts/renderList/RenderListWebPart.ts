@@ -6,7 +6,6 @@ import {
   PropertyPaneTextField,
   PropertyPaneDropdown,
   IPropertyPaneDropdownOption,
-  PropertyPaneDropdownOptionType,
 } from "@microsoft/sp-property-pane";
 import { PropertyFieldMultiSelect } from "@pnp/spfx-property-controls/lib/PropertyFieldMultiSelect";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
@@ -21,6 +20,7 @@ export interface IRenderListWebPartProps {
   selectList: string;
   fields: string[];
   fieldDetails: any;
+  title: string;
 }
 
 export default class RenderListWebPart extends BaseClientSideWebPart<IRenderListWebPartProps> {
@@ -76,13 +76,13 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
   }
 
   public render(): void {
-    console.log(this.properties.fields);
     const element: React.ReactElement<IRenderListProps> = React.createElement(
       RenderList,
       {
         context: this.context,
         list: this.properties.selectList,
         fields: this.mapFields(),
+        title: this.properties.title
       }
     );
 
@@ -108,6 +108,10 @@ export default class RenderListWebPart extends BaseClientSideWebPart<IRenderList
             {
               groupName: strings.ConfigureList,
               groupFields: [
+                PropertyPaneTextField("title", {
+                  label: strings.WebPartTitle,
+                  value: this.properties.title,
+                }),
                 PropertyPaneDropdown("selectList", {
                   label: strings.SelectListFieldLabel,
                   options: this._lists,
